@@ -8,7 +8,9 @@ from Product_List import Product_List
 conn = None
 c = None
 
-# connect to the database
+###########################################################################
+######################## CONNECT TO DATABASE ##############################
+###########################################################################
 
 
 def connect():
@@ -23,11 +25,10 @@ def connect():
         print("Database connection failed")
         print(e)
 
-# create the tables in the database
 
-# create the customber table
-
-
+###########################################################################
+######################## CREATE TABLES ####################################
+###########################################################################
 def createTables():
     try:
         c.execute("""CREATE TABLE Customer (
@@ -78,9 +79,10 @@ def createTables():
     except:
         print("error creating Product table")
 
-# Customer methods
 
-
+###########################################################################
+######################## CUSTOMER METHODS #################################
+###########################################################################
 def insert_customer(cust):
     with conn:
         c.execute("INSERT INTO Customer VALUES (:id, :first, :last, :houseNum, :street, :city)",
@@ -109,9 +111,10 @@ def remove_cust(cust):
         c.execute("DELETE from Customer WHERE first = :first AND last = :last",
                   {'first': cust.FirstName, 'last': cust.LastName})
 
-# Store table methods
 
-
+###########################################################################
+######################## STORE METHODS ####################################
+###########################################################################
 def insert_store(store):
     with conn:
         c.execute("INSERT INTO Store VALUES (:id, :CompName, :url, :BuildingNum, :street, :city)",
@@ -122,7 +125,9 @@ def get_all_store():
     c.execute("SELECT * FROM Store")
     return c.fetchall()
 
-# Product_List Methods
+###########################################################################
+######################## PROUCT LIST METHODS ##############################
+###########################################################################
 
 
 def insert_list(list):
@@ -135,9 +140,10 @@ def get_all_list():
     c.execute("SELECT * FROM Product_List")
     return c.fetchall()
 
-# Product Methods
 
-
+###########################################################################
+######################## PRODUCT METHODS ##################################
+###########################################################################
 def insert_product(product):
     with conn:
         c.execute("INSERT INTO Product VALUES (:id, :SKU, :Price, :Link, :Item_Name, :List_ID)",
@@ -148,9 +154,10 @@ def get_all_product():
     c.execute("SELECT * FROM Product")
     return c.fetchall()
 
-# main
 
-
+###########################################################################
+######################## MAIN #############################################
+###########################################################################
 def main():
 
     cust_1 = Customer('John', 'Doe', '12345', 'state street', 'la crosse')
