@@ -141,6 +141,11 @@ def get_all_list():
     return c.fetchall()
 
 
+def get_products_in_list(List_ID):
+    c.execute("SELECT * FROM Product WHERE list_ID = {}".format(List_ID))
+    return c.fetchall()
+
+
 ###########################################################################
 ######################## PRODUCT METHODS ##################################
 ###########################################################################
@@ -182,8 +187,18 @@ def main():
     insert_list(list_2)
 
     product_1 = Product("283YDGS", 29, "www.website.com", "t-shirt", 1)
+    product_2 = Product("343YDGS", 100, "www.website.com", "t-shirt", 2)
+    product_3 = Product("2586YDGS", 2, "www.website.com", "t-shirt", 51)
+    product_4 = Product("sjdDGS", 23, "www.website.com", "t-shirt", 1)
+    product_5 = Product("283Yeui8", 25, "www.website.com", "t-shirt", 19)
+    product_6 = Product("2dhrudh74", 200, "www.website.com", "t-shirt", 1)
 
     insert_product(product_1)
+    insert_product(product_2)
+    insert_product(product_3)
+    insert_product(product_4)
+    insert_product(product_5)
+    insert_product(product_6)
 
     # customers = get_cust_by_name('Doe')
 
@@ -200,10 +215,13 @@ def main():
     lists = get_all_list()
     products = get_all_product()
 
+    prods_in_1 = get_products_in_list(1)
+
     print(customers)
     print(stores)
     print(lists)
     print(products)
+    print(prods_in_1)
 
     conn.close()
 
