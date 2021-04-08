@@ -8,6 +8,7 @@ from Product_List import Product_List
 conn = None
 c = None
 
+
 ###########################################################################
 ######################## CONNECT TO DATABASE ##############################
 ###########################################################################
@@ -29,55 +30,55 @@ def connect():
 ###########################################################################
 ######################## CREATE TABLES ####################################
 ###########################################################################
-def createTables():
-    try:
-        c.execute("""CREATE TABLE Customer (
-				id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-				first text,
-				last text,
-				houseNum text,
-				street text,
-				city text
-				)""")
-        print("created customer table")
-    except:
-        print("error creating customer table")
-
-    try:
-        c.execute("""CREATE TABLE Store (
-				id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-				compName text,
-				url text,
-				buildingNum text,
-				street text,
-				city text
-				)""")
-        print("created store table")
-    except:
-        print("error creating store table")
-
-    try:
-        c.execute("""CREATE TABLE Product_List (
-				id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-				title text,
-				numItems int
-				)""")
-        print("created Product_list table")
-    except:
-        print("error creating Product_list table")
-
-    try:
-        c.execute("""CREATE TABLE Product (
-				id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-				SKU text,
-                price int,
-				link int,
-                item_name text,
-                List_ID int
-				)""")
-        print("created Product table")
-    except:
-        print("error creating Product table")
+# def createTables():
+#     try:
+#         c.execute("""CREATE TABLE Customer (
+#                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+#                 first text,
+#                 last text,
+#                 houseNum text,
+#                 street text,
+#                 city text
+#                 )""")
+#         print("created customer table")
+#     except:
+#         print("error creating customer table")
+#
+#     try:
+#         c.execute("""CREATE TABLE Store (
+#                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+#                 compName text,
+#                 url text,
+#                 buildingNum text,
+#                 street text,
+#                 city text
+#                 )""")
+#         print("created store table")
+#     except:
+#         print("error creating store table")
+#
+#     try:
+#         c.execute("""CREATE TABLE Product_List (
+#                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+#                 title text,
+#                 numItems int
+#                 )""")
+#         print("created Product_list table")
+#     except:
+#         print("error creating Product_list table")
+#
+#     try:
+#         c.execute("""CREATE TABLE Product (
+#                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+#                 SKU text,
+#                 price int,
+#                 link int,
+#                 item_name text,
+#                 List_ID int
+#                 )""")
+#         print("created Product table")
+#     except:
+#         print("error creating Product table")
 
 
 ###########################################################################
@@ -85,8 +86,9 @@ def createTables():
 ###########################################################################
 def insert_customer(cust):
     with conn:
-        c.execute("INSERT INTO Customer VALUES (:id, :first, :last, :houseNum, :street, :city)",
-                  {'id': None, 'first': cust.FirstName, 'last': cust.LastName, 'houseNum': cust.HouseNum, 'street': cust.Street, 'city': cust.City})
+        c.execute("INSERT INTO Customer VALUES (:CustomerID, :FirstName, :LastName, :Number, :Street, :City)",
+                  {'CustomerID': None, 'FirstName': cust.FirstName, 'LastName': cust.LastName, 'Number': cust.HouseNum,
+                   'Street': cust.Street, 'City': cust.City})
 
 
 def get_cust_by_name(lastname):
@@ -118,12 +120,14 @@ def remove_cust(cust):
 def insert_store(store):
     with conn:
         c.execute("INSERT INTO Store VALUES (:id, :CompName, :url, :BuildingNum, :street, :city)",
-                  {'id': None, 'CompName': store.CompName, 'url': store.URL, 'BuildingNum': store.BuildingNum, 'street': store.Street, 'city': store.City})
+                  {'id': None, 'CompName': store.CompName, 'url': store.URL, 'BuildingNum': store.BuildingNum,
+                   'street': store.Street, 'city': store.City})
 
 
 def get_all_store():
     c.execute("SELECT * FROM Store")
     return c.fetchall()
+
 
 ###########################################################################
 ######################## PROUCT LIST METHODS ##############################
@@ -152,7 +156,8 @@ def get_products_in_list(List_ID):
 def insert_product(product):
     with conn:
         c.execute("INSERT INTO Product VALUES (:id, :SKU, :Price, :Link, :Item_Name, :List_ID)",
-                  {'id': None, 'SKU': product.SKU, 'Price': product.Price, 'Link': product.Link, 'Item_Name': product.ItemName, 'List_ID': product.ListID})
+                  {'id': None, 'SKU': product.SKU, 'Price': product.Price, 'Link': product.Link,
+                   'Item_Name': product.ItemName, 'List_ID': product.ListID})
 
 
 def get_all_product():
@@ -164,7 +169,6 @@ def get_all_product():
 ######################## MAIN #############################################
 ###########################################################################
 def main():
-
     cust_1 = Customer('John', 'Doe', '12345', 'state street', 'la crosse')
     cust_2 = Customer('Jane', 'Doe', '111', 'state street', 'madison')
     cust_3 = Customer('Jim', 'Dolf', '1234', 'pine street', 'la crosse')
@@ -228,5 +232,4 @@ def main():
 
 if __name__ == "__main__":
     connect()
-    createTables()
-    main()
+    # main()
