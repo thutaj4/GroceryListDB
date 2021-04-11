@@ -38,7 +38,7 @@ def insert_customer(cust):
 
 
 def get_cust_by_name(lastname):
-    c.execute("SELECT * FROM Customer WHERE last=:last", {'last': lastname})
+    c.execute("SELECT * FROM Customer WHERE LastName=:LastName", {'LastName': lastname})
     return c.fetchall()
 
 
@@ -74,6 +74,10 @@ def get_all_store():
     c.execute("SELECT * FROM Store")
     return c.fetchall()
 
+def get_store_by_name(name):
+    c.execute("SELECT * FROM Store WHERE StoreName=:StoreName", {'StoreName': name})
+    return c.fetchall()
+
 
 ###########################################################################
 ######################## PROUCT LIST METHODS ##############################
@@ -85,6 +89,9 @@ def insert_list(list):
         c.execute("INSERT INTO ProductList VALUES (:id, :Title)",
                   {'id': None, 'Title': list.Title})
 
+def get_list_by_title(title):
+    c.execute("SELECT * FROM ProductList WHERE Title=:Title", {'Title': title})
+    return c.fetchall()
 
 def get_all_list():
     c.execute("SELECT * FROM ProductList")
@@ -110,11 +117,15 @@ def get_all_product():
     c.execute("SELECT * FROM Product")
     return c.fetchall()
 
+def get_product_by_name(name):
+    c.execute("SELECT * FROM Product WHERE ItemName=:ItemName", {'ItemName': name})
+    return c.fetchall()
+
 
 ###########################################################################
 ######################## MAIN #############################################
 ###########################################################################
-def main():
+def fill():
     cust_1 = Customer('John', 'Doe', 'state street',
                       '1234', 'la crosse', '54601', 'WI')
     cust_2 = Customer('Jane', 'Duh', 'pine street',
@@ -162,15 +173,95 @@ def main():
     lists = get_all_list()
     products = get_all_product()
 
-    print(customers)
-    print(stores)
-    print(lists)
-    print(products)
+    # print(customers)
+    # print(stores)
+    # print(lists)
+    # print(products)
 
     conn.close()
     print("DB Closed")
 
+# called when the user want to add data to the database
+def addSomthing():
+    print("\n(AU) -- Add a user")
+    print("(AP) -- Add a product")
+    print("(AL) -- Add a list")
+    print("(AS) -- Add a store")
+    
+    selection = input("Select what to add: ").upper()
+
+# called when the user want to remove data to the database
+def removeSomthing():
+    print("\n(RU) -- Remove a user")
+    print("(RP) -- Remove a product")
+    print("(RL) -- Remove a list")
+    print("(RS) -- Remove a store")
+    
+    selection = input("Select what to remove: ").upper()
+
+# called when the user want to view data to the database
+def viewStoredData():
+    print("\n(VU) -- View a user")
+    print("(VP) -- View a product")
+    print("(VL) -- View a list")
+    print("(VS) -- View a store")
+
+    selection = input("Select what to see: ").upper()
+
+    if selection == "VU":
+        nextSelection = input("(name, all) Would you like to look up by name or view all users? ")
+        if nextSelection == "name":
+            name = input("Enter a last name: ")
+            print(get_cust_by_name(name))
+        elif nextSelection == "all":
+            print(get_all_cust())
+
+    elif selection == "VP":
+        nextSelection = input("(name, all) Would you like to look up by name or view all products? ")
+        if nextSelection == "name":
+            name = input("Enter a product name: ")
+            print(get_product_by_name(name))
+        elif nextSelection == "all":
+            print(get_all_product())
+
+    elif selection == "VL":
+        nextSelection = input("(title, all) Would you like to look up by title or view all lists? ")
+        if nextSelection == "title":
+            title = input("Enter a list title: ")
+            print(get_list_by_title(title))
+        elif nextSelection == "all":
+            print(get_all_list())
+
+    elif selection == "VS":
+        nextSelection = input("(name, all) Would you like to look up by name or view all stores? ")
+        if nextSelection == "name":
+            name = input("Enter a store name: ")
+            print(get_store_by_name(name))
+        elif nextSelection == "all":
+            print(get_all_store())
+
+
+def main():
+    print("Welcome to the shopping list")
+    
+    while(True):
+        print()
+        print("add somthing")
+        print("remove somthing")
+        print("view stored data\n")
+
+        val = input("What would you like to do? ").lower()
+        if val == "add somthing":
+            addSomthing()
+        elif val == "remove somthing":
+            removeSomthing()
+        elif val == "view stored data":
+            viewStoredData()
+        else:
+            print("\nInput, please try again")
+
 
 if __name__ == "__main__":
     connect()
+    # fill()
     main()
