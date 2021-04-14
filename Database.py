@@ -36,11 +36,9 @@ def insert_customer(cust):
                   {'CustomerID': None, 'FirstName': cust.FirstName, 'LastName': cust.LastName, 'Street': cust.Street, 'Number': cust.Number,
                    'City': cust.City, 'Zip': cust.Zip, 'State': cust.State})
 
-
 def get_cust_by_name(lastname):
     c.execute("SELECT * FROM Customer WHERE LastName=:LastName", {'LastName': lastname})
     return c.fetchall()
-
 
 def get_all_cust():
     c.execute("SELECT * FROM Customer")
@@ -91,7 +89,6 @@ def insert_store(store):
                   {'id': None, 'StoreName': store.StoreName, 'URL': store.URL, 'Street': store.Street,
                    'Number': store.Number, 'City': store.City, 'Zip': store.Zip, 'State': store.State})
 
-
 def get_all_store():
     c.execute("SELECT * FROM Store")
     return c.fetchall()
@@ -100,6 +97,36 @@ def get_store_by_name(name):
     c.execute("SELECT * FROM Store WHERE StoreName=:StoreName", {'StoreName': name})
     return c.fetchall()
 
+def edit_store(StoreID, attribute, newVal):
+    if attribute == "store name":
+        with conn:
+            c.execute("UPDATE Store SET StoreName = :StoreName WHERE StoreID = :StoreID",
+             {'StoreName': newVal, 'StoreID': StoreID})
+    elif attribute == "url":
+        with conn:
+            c.execute("UPDATE Store SET URL = :URL WHERE StoreID = :StoreID",
+             {'URL': newVal, 'StoreID': StoreID})
+    elif attribute == "street":
+        with conn:
+            c.execute("UPDATE Store SET Street = :Street WHERE StoreID = :StoreID",
+             {'Street': newVal, 'StoreID': StoreID})
+    elif attribute == "number":
+        with conn:
+            c.execute("UPDATE Store SET Number = :Number WHERE StoreID = :StoreID",
+             {'Number': newVal, 'StoreID': StoreID})
+    elif attribute == "city":
+        with conn:
+            c.execute("UPDATE Store SET City = :City WHERE StoreID = :StoreID",
+             {'City': newVal, 'StoreID': StoreID})
+    elif attribute == "zip":
+        with conn:
+            c.execute("UPDATE Store SET Zip = :Zip WHERE StoreID = :StoreID",
+             {'Zip': newVal, 'StoreID': StoreID})
+    elif attribute == "state":
+        with conn:
+            c.execute("UPDATE Store SET State = :State WHERE StoreID = :StoreID",
+             {'State': newVal, 'StoreID': StoreID})
+
 def remove_store(StoreName):
     with conn:
         c.execute("DELETE from Store WHERE StoreName = :StoreName", {'StoreName': StoreName})
@@ -107,7 +134,6 @@ def remove_store(StoreName):
 ###########################################################################
 ######################## PROUCT LIST METHODS ##############################
 ###########################################################################
-
 
 def insert_list(list):
     with conn:
@@ -121,6 +147,12 @@ def get_list_by_title(title):
 def get_all_list():
     c.execute("SELECT * FROM ProductList")
     return c.fetchall()
+
+def edit_product_list(id, attribute, newVal):
+    if attribute == "title":
+        with conn:
+            c.execute("UPDATE ProductList SET Title = :Title WHERE ProductListID = :ProductListID",
+             {'Title': newVal, 'ProductListID': id})
 
 def remove_product_list(Title):
     with conn:
@@ -140,7 +172,6 @@ def insert_product(product):
                   {'id': None, 'SKU': product.SKU, 'Price': product.Price, 'Link': product.Link,
                    'ItemName': product.ItemName})
 
-
 def get_all_product():
     c.execute("SELECT * FROM Product")
     return c.fetchall()
@@ -149,10 +180,27 @@ def get_product_by_name(name):
     c.execute("SELECT * FROM Product WHERE ItemName=:ItemName", {'ItemName': name})
     return c.fetchall()
 
+def edit_product(id, attribute, newVal):
+    if attribute == "sku":
+        with conn:
+            c.execute("UPDATE Product SET SKU = :SKU WHERE ProductID = :ProductID",
+             {'SKU': newVal, 'ProductID': id})
+    elif attribute == "price":
+        with conn:
+            c.execute("UPDATE Product SET price = :price WHERE ProductID = :ProductID",
+             {'price': newVal, 'ProductID': id})
+    elif attribute == "link":
+        with conn:
+            c.execute("UPDATE Product SET link = :link WHERE ProductID = :ProductID",
+             {'link': newVal, 'ProductID': id})
+    elif attribute == "item name":
+        with conn:
+            c.execute("UPDATE Product SET ItemName = :ItemName WHERE ProductID = :ProductID",
+             {'ItemName': newVal, 'ProductID': id})
+
 def remove_product(SKU):
     with conn:
         c.execute("DELETE from Product WHERE SKU = :SKU", {'SKU': SKU})
-
 
 ###########################################################################
 ######################## MAIN #############################################
@@ -312,22 +360,28 @@ def editSomthing():
         print("User has been updated")
 
     elif selection == "EP":
-        print("Enter SKU of item to edit")
-        SKU = input("Enter a SKU: ")
-        remove_product(SKU)
-        print(SKU + " has been updated")
+        print("Enter id of product to edit")
+        id = input("Enter a id: ")
+        attribute = input("Enter the attribute you want to change (SKU, price, link, item name): ").lower()
+        newVal = input("Enter the new value: ")
+        edit_product(id, attribute, newVal)
+        print("Product has been updated")
 
     elif selection == "EL":
-        print("Enter title of list to edit")
-        Title = input("Enter a title: ")
-        remove_product_list(Title)
-        print(Title + " has been updated")
+        print("Enter id of list to edit")
+        id = input("Enter a id: ")
+        attribute = input("Enter the attribute you want to change (title): ").lower()
+        newVal = input("Enter the new value: ")
+        edit_product_list(id, attribute, newVal)
+        print("List has been updated")
 
     elif selection == "ES":
-        print("Enter name of store to edit")
-        StoreName = input("Enter a name: ")
-        remove_store(StoreName)
-        print(StoreName + " has been updated")
+        print("Enter id of store to edit")
+        id = input("Enter a id: ")
+        attribute = input("Enter the attribute you want to change (store name, URL, street, number, city, zip, state): ").lower()
+        newVal = input("Enter the new value: ")
+        edit_store(id, attribute, newVal)
+        print("User has been updated")
 
 # called when the user want to view data to the database
 def viewStoredData():
