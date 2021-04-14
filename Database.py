@@ -26,6 +26,55 @@ def connect():
         print("Database connection failed")
         print(e)
 
+###########################################################################
+######################## FILL DATABASE ####################################
+###########################################################################
+def fill():
+    cust_1 = Customer('John', 'Doe', 'state street',
+                      '1234', 'la crosse', '54601', 'WI')
+    cust_2 = Customer('Jane', 'Duh', 'pine street',
+                      '333', 'la crosse', '54601', 'WI')
+    cust_3 = Customer('Tim', 'Doe', 'state street',
+                      '1234', 'la crosse', '54601', 'WI')
+    cust_4 = Customer('Timmy', 'Kim', '12th street',
+                      '1212', 'la crosse', '54603', 'WI')
+
+    insert_customer(cust_1)
+    insert_customer(cust_2)
+    insert_customer(cust_3)
+    insert_customer(cust_4)
+
+    store_1 = Store('Festival', 'www.festival.com',
+                    'lousy BLVD', '232', 'Lacrosse', '54601', 'WI')
+    store_2 = Store('Target', 'www.target.com',
+                    'county highway', '1112', 'Onalaska', '54603', 'WI')
+
+    insert_store(store_1)
+    insert_store(store_2)
+
+    list_1 = Product_List("shopping list")
+    list_2 = Product_List("wish list")
+
+    insert_list(list_1)
+    insert_list(list_2)
+
+    product_1 = Product("283YDGS", 29.00, "www.website.com", "paper")
+    product_2 = Product("343YDGS", 100.00, "www.website.com", "t-shirt")
+    product_3 = Product("2586YDGS", 2.99, "www.website.com", "t-shirt")
+    product_4 = Product("sjdDGS", 23.99, "www.website.com", "pants")
+    product_5 = Product("283Yeui8", 25.00, "www.website.com", "apple")
+    product_6 = Product("2dhrudh74", 200.00, "www.website.com", "t-shirt")
+
+    insert_product(product_1)
+    insert_product(product_2)
+    insert_product(product_3)
+    insert_product(product_4)
+    insert_product(product_5)
+    insert_product(product_6)
+
+    conn.close()
+    print("DB Closed")
+
 
 ###########################################################################
 ######################## CUSTOMER METHODS #################################
@@ -78,7 +127,6 @@ def remove_cust(FirstName, LastName):
     with conn:
         c.execute("DELETE from Customer WHERE FirstName = :FirstName AND LastName = :LastName",
                   {'FirstName': FirstName, 'LastName': LastName})
-
 
 ###########################################################################
 ######################## STORE METHODS ####################################
@@ -158,11 +206,6 @@ def remove_product_list(Title):
     with conn:
             c.execute("DELETE from ProductList WHERE Title = :Title", {'Title': Title})
 
-# def get_products_in_list(List_ID):
-#     c.execute("SELECT * FROM ProductListHAS WHERE list_ID = {}".format(List_ID))
-#     return c.fetchall()
-
-
 ###########################################################################
 ######################## PRODUCT METHODS ##################################
 ###########################################################################
@@ -203,63 +246,8 @@ def remove_product(SKU):
         c.execute("DELETE from Product WHERE SKU = :SKU", {'SKU': SKU})
 
 ###########################################################################
-######################## MAIN #############################################
+######################## USER INPUT #######################################
 ###########################################################################
-def fill():
-    cust_1 = Customer('John', 'Doe', 'state street',
-                      '1234', 'la crosse', '54601', 'WI')
-    cust_2 = Customer('Jane', 'Duh', 'pine street',
-                      '333', 'la crosse', '54601', 'WI')
-    cust_3 = Customer('Tim', 'Doe', 'state street',
-                      '1234', 'la crosse', '54601', 'WI')
-    cust_4 = Customer('Timmy', 'Kim', '12th street',
-                      '1212', 'la crosse', '54603', 'WI')
-
-    insert_customer(cust_1)
-    insert_customer(cust_2)
-    insert_customer(cust_3)
-    insert_customer(cust_4)
-
-    store_1 = Store('Festival', 'www.festival.com',
-                    'lousy BLVD', '232', 'Lacrosse', '54601', 'WI')
-    store_2 = Store('Target', 'www.target.com',
-                    'county highway', '1112', 'Onalaska', '54603', 'WI')
-
-    insert_store(store_1)
-    insert_store(store_2)
-
-    list_1 = Product_List("shopping list")
-    list_2 = Product_List("wish list")
-
-    insert_list(list_1)
-    insert_list(list_2)
-
-    product_1 = Product("283YDGS", 29.00, "www.website.com", "paper")
-    product_2 = Product("343YDGS", 100.00, "www.website.com", "t-shirt")
-    product_3 = Product("2586YDGS", 2.99, "www.website.com", "t-shirt")
-    product_4 = Product("sjdDGS", 23.99, "www.website.com", "pants")
-    product_5 = Product("283Yeui8", 25.00, "www.website.com", "apple")
-    product_6 = Product("2dhrudh74", 200.00, "www.website.com", "t-shirt")
-
-    insert_product(product_1)
-    insert_product(product_2)
-    insert_product(product_3)
-    insert_product(product_4)
-    insert_product(product_5)
-    insert_product(product_6)
-
-    customers = get_all_cust()
-    stores = get_all_store()
-    lists = get_all_list()
-    products = get_all_product()
-
-    # print(customers)
-    # print(stores)
-    # print(lists)
-    # print(products)
-
-    conn.close()
-    print("DB Closed")
 
 # called when the user want to add data to the database
 def addSomthing():
@@ -309,7 +297,6 @@ def addSomthing():
         insert_store(store)
         print(StoreName + " has been added")
 
-
 # called when the user want to remove data to the database
 def removeSomthing():
     print("\n(RU) -- Remove a user")
@@ -343,6 +330,7 @@ def removeSomthing():
         remove_store(StoreName)
         print(StoreName + " has been removed")
 
+# called when the user want to edit data already in the database
 def editSomthing():
     print("\n(EU) -- Edit a user")
     print("(EP) -- Edit a product")
@@ -424,7 +412,9 @@ def viewStoredData():
         elif nextSelection == "all":
             print(get_all_store())
 
-
+###########################################################################
+######################## MAIN #############################################
+###########################################################################
 def main():
     print("Welcome to the shopping list")
     
