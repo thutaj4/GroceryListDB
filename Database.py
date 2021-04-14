@@ -46,18 +46,40 @@ def get_all_cust():
     c.execute("SELECT * FROM Customer")
     return c.fetchall()
 
+def edit_user(CustomerID, attribute, newVal):
+    if attribute == "first name":
+        with conn:
+            c.execute("UPDATE Customer SET FirstName = :FirstName WHERE CustomerID = :CustomerID",
+             {'FirstName': newVal, 'CustomerID': CustomerID})
+    elif attribute == "last name":
+        with conn:
+            c.execute("UPDATE Customer SET LastName = :LastName WHERE CustomerID = :CustomerID",
+             {'LastName': newVal, 'CustomerID': CustomerID})
+    elif attribute == "street":
+        with conn:
+            c.execute("UPDATE Customer SET Street = :Street WHERE CustomerID = :CustomerID",
+             {'Street': newVal, 'CustomerID': CustomerID})
+    elif attribute == "number":
+        with conn:
+            c.execute("UPDATE Customer SET Number = :Number WHERE CustomerID = :CustomerID",
+             {'Number': newVal, 'CustomerID': CustomerID})
+    elif attribute == "city":
+        with conn:
+            c.execute("UPDATE Customer SET City = :City WHERE CustomerID = :CustomerID",
+             {'City': newVal, 'CustomerID': CustomerID})
+    elif attribute == "zip":
+        with conn:
+            c.execute("UPDATE Customer SET Zip = :Zip WHERE CustomerID = :CustomerID",
+             {'Zip': newVal, 'CustomerID': CustomerID})
+    elif attribute == "state":
+        with conn:
+            c.execute("UPDATE Customer SET State = :State WHERE CustomerID = :CustomerID",
+             {'State': newVal, 'CustomerID': CustomerID})
 
-def update_address(cust, city):
+def remove_cust(FirstName, LastName):
     with conn:
-        c.execute("""UPDATE Customer SET city = :city
-                    WHERE first = :first AND last = :last""",
-                  {'first': cust.FirstName, 'last': cust.LastName, 'city': city})
-
-
-def remove_cust(cust):
-    with conn:
-        c.execute("DELETE from Customer WHERE first = :first AND last = :last",
-                  {'first': cust.FirstName, 'last': cust.LastName})
+        c.execute("DELETE from Customer WHERE FirstName = :FirstName AND LastName = :LastName",
+                  {'FirstName': FirstName, 'LastName': LastName})
 
 
 ###########################################################################
@@ -78,6 +100,9 @@ def get_store_by_name(name):
     c.execute("SELECT * FROM Store WHERE StoreName=:StoreName", {'StoreName': name})
     return c.fetchall()
 
+def remove_store(StoreName):
+    with conn:
+        c.execute("DELETE from Store WHERE StoreName = :StoreName", {'StoreName': StoreName})
 
 ###########################################################################
 ######################## PROUCT LIST METHODS ##############################
@@ -97,6 +122,9 @@ def get_all_list():
     c.execute("SELECT * FROM ProductList")
     return c.fetchall()
 
+def remove_product_list(Title):
+    with conn:
+            c.execute("DELETE from ProductList WHERE Title = :Title", {'Title': Title})
 
 # def get_products_in_list(List_ID):
 #     c.execute("SELECT * FROM ProductListHAS WHERE list_ID = {}".format(List_ID))
@@ -120,6 +148,10 @@ def get_all_product():
 def get_product_by_name(name):
     c.execute("SELECT * FROM Product WHERE ItemName=:ItemName", {'ItemName': name})
     return c.fetchall()
+
+def remove_product(SKU):
+    with conn:
+        c.execute("DELETE from Product WHERE SKU = :SKU", {'SKU': SKU})
 
 
 ###########################################################################
@@ -186,25 +218,123 @@ def addSomthing():
     print("\n(AU) -- Add a user")
     print("(AP) -- Add a product")
     print("(AL) -- Add a list")
-    print("(AS) -- Add a store")
+    print("(AS) -- Add a store\n")
     
     selection = input("Select what to add: ").upper()
+
+    if selection == "AU":
+        FirstName = input("Enter a first name: ")
+        LastName = input("Enter a last name: ")
+        Street = input("Enter a street: ")
+        Number = input("Enter a house number: ")
+        City = input("Enter a city: ")
+        Zip = input("Enter a zip code: ")
+        State = input("Enter a state: ")
+        cust = Customer(FirstName, LastName, Street, Number, City, Zip, State)
+        insert_customer(cust) 
+        print(FirstName + " has been added")
+
+    elif selection == "AP":
+        SKU = input("Enter a SKU: ")
+        Price = input("Enter a price: ")
+        Link = input("Enter a link: ")
+        ItemName = input("Enter a item name: ")
+        prod = Product(SKU, Price, Link, ItemName)
+        insert_product(prod) 
+        print(ItemName + " has been added")
+
+    elif selection == "AL":
+        Title = input("Enter a title: ")
+        list = Product_List(Title)
+        insert_list(list)
+        print(Title + " has been added")
+
+    elif selection == "AS":
+        StoreName = input("Enter a store name: ")
+        URL = input("Enter a url: ")
+        Street = input("Enter a street: ")
+        Number = input("Enter a house number: ")
+        City = input("Enter a city: ")
+        Zip = input("Enter a zip code: ")
+        State = input("Enter a state: ")
+        store = Store(StoreName, URL, Street, Number, City, Zip, State)
+        insert_store(store)
+        print(StoreName + " has been added")
+
 
 # called when the user want to remove data to the database
 def removeSomthing():
     print("\n(RU) -- Remove a user")
     print("(RP) -- Remove a product")
     print("(RL) -- Remove a list")
-    print("(RS) -- Remove a store")
+    print("(RS) -- Remove a store\n")
     
     selection = input("Select what to remove: ").upper()
+
+    if selection == "RU":
+        print("Enter first and last name of user to remove")
+        FirstName = input("Enter a first name: ")
+        LastName = input("Enter a last name: ")
+        remove_cust(FirstName, LastName)
+        print(FirstName + " " + LastName + " has been removed")
+
+    elif selection == "RP":
+        print("Enter SKU of item to remove")
+        SKU = input("Enter a SKU: ")
+        remove_product(SKU)
+        print(SKU + " has been removed")
+
+    elif selection == "RL":
+        print("Enter title of list to remove")
+        Title = input("Enter a title: ")
+        remove_product_list(Title)
+        print(Title + " has been removed")
+    elif selection == "RS":
+        print("Enter name of store to remove")
+        StoreName = input("Enter a name: ")
+        remove_store(StoreName)
+        print(StoreName + " has been removed")
+
+def editSomthing():
+    print("\n(EU) -- Edit a user")
+    print("(EP) -- Edit a product")
+    print("(EL) -- Edit a list")
+    print("(ES) -- Edit a store\n")
+    
+    selection = input("Select what to Edit: ").upper()
+
+    if selection == "EU":
+        print("Enter id of user to edit")
+        id = input("Enter a id: ")
+        attribute = input("Enter the attribute you want to change (first name, last name, street, number, city, zip, state): ").lower()
+        newVal = input("Enter the new value: ")
+        edit_user(id, attribute, newVal)
+        print("User has been updated")
+
+    elif selection == "EP":
+        print("Enter SKU of item to edit")
+        SKU = input("Enter a SKU: ")
+        remove_product(SKU)
+        print(SKU + " has been updated")
+
+    elif selection == "EL":
+        print("Enter title of list to edit")
+        Title = input("Enter a title: ")
+        remove_product_list(Title)
+        print(Title + " has been updated")
+
+    elif selection == "ES":
+        print("Enter name of store to edit")
+        StoreName = input("Enter a name: ")
+        remove_store(StoreName)
+        print(StoreName + " has been updated")
 
 # called when the user want to view data to the database
 def viewStoredData():
     print("\n(VU) -- View a user")
     print("(VP) -- View a product")
     print("(VL) -- View a list")
-    print("(VS) -- View a store")
+    print("(VS) -- View a store\n")
 
     selection = input("Select what to see: ").upper()
 
@@ -248,6 +378,7 @@ def main():
         print()
         print("add somthing")
         print("remove somthing")
+        print("edit somthing")
         print("view stored data\n")
 
         val = input("What would you like to do? ").lower()
@@ -255,6 +386,8 @@ def main():
             addSomthing()
         elif val == "remove somthing":
             removeSomthing()
+        elif val == "edit somthing":
+            editSomthing()
         elif val == "view stored data":
             viewStoredData()
         else:
