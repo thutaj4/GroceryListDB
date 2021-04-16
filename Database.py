@@ -245,6 +245,64 @@ def remove_product(SKU):
     with conn:
         c.execute("DELETE from Product WHERE SKU = :SKU", {'SKU': SKU})
 
+
+###########################################################################
+######################## CustomerHAS methods ##############################
+###########################################################################
+
+def insert_customerHAS(custID, listID):
+    with conn:
+        c.execute("INSERT INTO CustomerHAS VALUES (:CustomerID, :ProductListID)",
+                  {'CustomerID': custID, 'ProductListID': listID})
+
+def get_all_cust_list():
+    with conn:
+        c.execute("SELECT FirstName, LastName, Title FROM Customer NATURAL JOIN CustomerHAS NATURAL JOIN ProductList")
+        return c.fetchall()
+
+###########################################################################
+######################## CustomerPURCHASED methods ##############################
+###########################################################################
+
+def insert_customerPURCHASED(custID, prodID, date):
+    with conn:
+        c.execute("INSERT INTO CustomerPURCHASED VALUES (:CustomerID, :ProductID, :Date)",
+                  {'CustomerID': custID, 'ProductID': prodID, 'Date': date})
+
+def get_all_cust_purch():
+    with conn:
+        c.execute("SELECT FirstName, LastName, ItemName, Date FROM Customer NATURAL JOIN CustomerPURCHASED NATURAL JOIN Product")
+        return c.fetchall()
+
+###########################################################################
+######################## ProductListHAS methods ##############################
+###########################################################################
+
+def insert_productListHAS(listID, prodID):
+    with conn:
+        c.execute("INSERT INTO ProductListHAS VALUES (:ProductListID, :ProductID)",
+                  {'ProductListID': listID, 'ProductID': prodID})
+
+def get_all_list_prods():
+    with conn:
+        c.execute("SELECT Title, ItemName FROM ProductList NATURAL JOIN ProductListHAS NATURAL JOIN Product")
+        return c.fetchall()
+
+###########################################################################
+######################## StoreSELLS methods ##############################
+###########################################################################
+
+def insert_storeSELLS(storeID, prodID):
+    with conn:
+        c.execute("INSERT INTO StoreSELLS VALUES (:StoreID, :ProductID)",
+                  {'StoreID': storeID, 'ProductID': prodID})
+
+def get_all_store_sells():
+    with conn:
+        c.execute("SELECT StoreName, ItemName FROM Product NATURAL JOIN StoreSELLS NATURAL JOIN STORE")
+        return c.fetchall()
+
+
 ###########################################################################
 ######################## USER INPUT #######################################
 ###########################################################################
@@ -254,6 +312,8 @@ def addSomthing():
     print("\n(AU) -- Add a user")
     print("(AP) -- Add a product")
     print("(AL) -- Add a list")
+    print("(APL) -- Add a product to list")
+    print("(APO) -- Add a product to order history")
     print("(AS) -- Add a store\n")
     
     selection = input("Select what to add: ").upper()
@@ -277,13 +337,38 @@ def addSomthing():
         ItemName = input("Enter a item name: ")
         prod = Product(SKU, Price, Link, ItemName)
         insert_product(prod) 
+        enterRel = input("would you like to set the store that sells this product? (y, n) ")
+        if(enterRel == 'y'):
+            prodID = input("Enter product ID ")
+            storeID = input("Enter store ID ")
+            insert_storeSELLS(storeID, prodID)
         print(ItemName + " has been added")
 
     elif selection == "AL":
         Title = input("Enter a title: ")
         list = Product_List(Title)
         insert_list(list)
+
+        enterRel = input("would you like to associate a cutomer with this list? (y, n) ")
+        if(enterRel == 'y'):
+            custID = input("Enter customer ID ")
+            listID = input("Enter list ID ")
+            insert_customerHAS(custID, listID)
+
         print(Title + " has been added")
+
+    elif selection == "APL":
+        listID = input("Enter list ID for the list ")
+        prodID = input("Enter product ID for the product ")
+        insert_productListHAS(listID, prodID)
+        print("Product has been added to the list")
+
+    elif selection == "APO":
+        custID = input("Enter customer ID for the customer ")
+        prodID = input("Enter product ID for the product ")
+        date = input("Enter the date of purchase ")
+        insert_customerPURCHASED(custID, prodID, date)
+        print("Product has been added to the order history")
 
     elif selection == "AS":
         StoreName = input("Enter a store name: ")
@@ -412,6 +497,25 @@ def viewStoredData():
         elif nextSelection == "all":
             print(get_all_store())
 
+def otherQueries():
+    print("(VCL) -- View customer's lists")
+    print("(VIL) -- View all Items in lists")
+    print("(VSP) -- View all store's products")
+    print("(VCH) -- View customer's order history\n")
+
+    selection = input("Select what to see: ").upper()
+
+    if selection == "VCL":
+        print(get_all_cust_list())
+    elif selection == "VIL":
+        print(get_all_list_prods())
+    elif selection == "VSP":
+        print(get_all_store_sells())
+    elif selection == "VCH":
+        print(get_all_cust_purch())
+        
+    
+
 ###########################################################################
 ######################## MAIN #############################################
 ###########################################################################
@@ -423,7 +527,8 @@ def main():
         print("add somthing")
         print("remove somthing")
         print("edit somthing")
-        print("view stored data\n")
+        print("view stored data")
+        print("other\n")
 
         val = input("What would you like to do? ").lower()
         if val == "add somthing":
@@ -434,6 +539,8 @@ def main():
             editSomthing()
         elif val == "view stored data":
             viewStoredData()
+        elif val == "other":
+            otherQueries()
         else:
             print("\nInput, please try again")
 
