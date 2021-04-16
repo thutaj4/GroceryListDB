@@ -8,11 +8,9 @@ from Product_List import Product_List
 conn = None
 c = None
 
-
 ###########################################################################
 ######################## CONNECT TO DATABASE ##############################
 ###########################################################################
-
 
 def connect():
     global conn
@@ -260,6 +258,10 @@ def get_all_cust_list():
         c.execute("SELECT FirstName, LastName, Title FROM Customer NATURAL JOIN CustomerHAS NATURAL JOIN ProductList")
         return c.fetchall()
 
+def get_cust_list(custID):
+    with conn:
+        c.execute("SELECT Title FROM Customer NATURAL JOIN CustomerHAS NATURAL JOIN ProductList WHERE CustomerID = {}".format(custID))
+        return c.fetchall()
 ###########################################################################
 ######################## CustomerPURCHASED methods ##############################
 ###########################################################################
@@ -272,6 +274,11 @@ def insert_customerPURCHASED(custID, prodID, date):
 def get_all_cust_purch():
     with conn:
         c.execute("SELECT FirstName, LastName, ItemName, Date FROM Customer NATURAL JOIN CustomerPURCHASED NATURAL JOIN Product")
+        return c.fetchall()
+
+def get_cust_purch(custID):
+    with conn:
+        c.execute("SELECT ItemName, Date FROM Customer NATURAL JOIN CustomerPURCHASED NATURAL JOIN Product WHERE CustomerID = {}".format(custID))
         return c.fetchall()
 
 ###########################################################################
@@ -288,6 +295,11 @@ def get_all_list_prods():
         c.execute("SELECT Title, ItemName FROM ProductList NATURAL JOIN ProductListHAS NATURAL JOIN Product")
         return c.fetchall()
 
+def get_list_prods(custID):
+    with conn:
+        c.execute("SELECT ItemName FROM Customer NATURAL JOIN CustomerHAS NATURAL JOIN ProductList NATURAL JOIN ProductListHAS NATURAL JOIN Product WHERE CustomerID = {}".format(custID))
+        return c.fetchall()
+
 ###########################################################################
 ######################## StoreSELLS methods ##############################
 ###########################################################################
@@ -300,6 +312,11 @@ def insert_storeSELLS(storeID, prodID):
 def get_all_store_sells():
     with conn:
         c.execute("SELECT StoreName, ItemName FROM Product NATURAL JOIN StoreSELLS NATURAL JOIN STORE")
+        return c.fetchall()
+
+def get_store_sells(storeID):
+    with conn:
+        c.execute("SELECT ItemName FROM Product NATURAL JOIN StoreSELLS NATURAL JOIN STORE WHERE StoreID = {}".format(storeID))
         return c.fetchall()
 
 
@@ -461,7 +478,11 @@ def viewStoredData():
     print("\n(VU) -- View a user")
     print("(VP) -- View a product")
     print("(VL) -- View a list")
-    print("(VS) -- View a store\n")
+    print("(VS) -- View a store")
+    print("(VCL) -- View customer's lists")
+    print("(VIL) -- View all Items in lists")
+    print("(VSP) -- View all store's products")
+    print("(VCH) -- View customer's order history\n")
 
     selection = input("Select what to see: ").upper()
 
@@ -496,25 +517,37 @@ def viewStoredData():
             print(get_store_by_name(name))
         elif nextSelection == "all":
             print(get_all_store())
+    elif selection == "VCL":
+        choice = input("Enter a customer id to view their lists, or ALL to view all the customer's lists ").lower()
+        if choice == 'all':
+            print(get_all_cust_list())
+        else:
+            print(get_cust_list(choice))
+    elif selection == "VIL":
+        choice = input("Enter a customer id to view their list items, or ALL to view all the list's items ").lower()
+        if choice == 'all':
+            print(get_all_list_prods())
+        else:
+            print(get_list_prods(choice))
+    elif selection == "VSP":
+        choice = input("Enter a store id to view its products, or ALL to view all the stores inventory ").lower()
+        if choice == 'all':
+            print(get_all_store_sells())
+        else:
+            print(get_store_sells(choice))
+    elif selection == "VCH":
+        choice = input("Enter a customer id to view their history, or ALL to view all the customer's history ").lower()
+        if choice == 'all':
+            print(get_all_cust_purch())
+        else:
+            print(get_cust_purch(choice))
 
+# called when the user wants to call complex queries
 def otherQueries():
-    print("(VCL) -- View customer's lists")
-    print("(VIL) -- View all Items in lists")
-    print("(VSP) -- View all store's products")
-    print("(VCH) -- View customer's order history\n")
+    print("(Q1) -- View customer's lists who have more then 3 items from Target\n")
 
     selection = input("Select what to see: ").upper()
 
-    if selection == "VCL":
-        print(get_all_cust_list())
-    elif selection == "VIL":
-        print(get_all_list_prods())
-    elif selection == "VSP":
-        print(get_all_store_sells())
-    elif selection == "VCH":
-        print(get_all_cust_purch())
-        
-    
 
 ###########################################################################
 ######################## MAIN #############################################
