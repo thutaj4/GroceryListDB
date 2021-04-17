@@ -787,7 +787,41 @@ def get_store_sells(storeID):
         c.execute("SELECT ItemName FROM Product NATURAL JOIN StoreSELLS NATURAL JOIN STORE WHERE StoreID = {}".format(storeID))
         return c.fetchall()
 
+###########################################################################
+######################## Advanced Quries ##############################
+###########################################################################
+# Group 1: aggregate functions,LIKE,GROUP BY,ORDER BY,LIMIT– 
+# Group 2:HAVING,OFFSET, outer join, joining four or more tables– 
+# Group 3: subqueries,IN, set operators, any additional functionality outside of whatwas discussed in class will likely fall into this category (but please talk to me first if wedid not cover this in class)
+def advanced1():
+    with conn:
+        c.execute("""SELECT FirstName, LastName FROM Customer NATURAL JOIN CustomerPURCHASED NATURAL JOIN Product WHERE LastName LIKE 'D%' """)
+        return c.fetchall()
 
+def advanced2():
+    with conn:
+        c.execute("SELECT StoreName, ItemName FROM Product NATURAL JOIN StoreSELLS NATURAL JOIN STORE")
+        return c.fetchall()
+
+def advanced3():
+    with conn:
+        c.execute("SELECT StoreName, ItemName FROM Product NATURAL JOIN StoreSELLS NATURAL JOIN STORE")
+        return c.fetchall()
+
+def advanced4():
+    with conn:
+        c.execute("SELECT StoreName, ItemName FROM Product NATURAL JOIN StoreSELLS NATURAL JOIN STORE")
+        return c.fetchall()
+
+def advanced5():
+    with conn:
+        c.execute("SELECT StoreName, ItemName FROM Product NATURAL JOIN StoreSELLS NATURAL JOIN STORE")
+        return c.fetchall()
+
+def advanced6():
+    with conn:
+        c.execute("SELECT StoreName, ItemName FROM Product NATURAL JOIN StoreSELLS NATURAL JOIN STORE")
+        return c.fetchall()
 ###########################################################################
 ######################## USER INPUT #######################################
 ###########################################################################
@@ -1011,10 +1045,31 @@ def viewStoredData():
             print(get_cust_purch(choice))
 
 # called when the user wants to call complex queries
+
 def otherQueries():
     print("(Q1) -- View customer's lists who have more then 3 items from Target\n")
+    print("(Q2) -- View customer's lists who have more then 3 items from Target\n")
+    print("(Q3) -- View customer's lists who have more then 3 items from Target\n")
+    print("(Q4) -- View customer's lists who have more then 3 items from Target\n")
+    print("(Q5) -- View customer's lists who have more then 3 items from Target\n")
+    print("(Q6) -- View customer's lists who have more then 3 items from Target\n")
 
     selection = input("Select what to see: ").upper()
+
+    if selection == 'Q1':
+        print(advanced1())
+    elif selection == 'Q2':
+        print(advanced2())
+    elif selection == 'Q3':
+        print(advanced3())
+    elif selection == 'Q4':
+        print(advanced4())
+    elif selection == 'Q5':
+        print(advanced5())
+    elif selection == 'Q6':
+        print(advanced6())
+    else :
+        print("Not a valid selection")
 
 
 ###########################################################################
