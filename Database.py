@@ -793,29 +793,35 @@ def get_store_sells(storeID):
 # Group 1: aggregate functions,LIKE,GROUP BY,ORDER BY,LIMIT– 
 # Group 2:HAVING,OFFSET, outer join, joining four or more tables– 
 # Group 3: subqueries,IN, set operators, any additional functionality outside of whatwas discussed in class will likely fall into this category (but please talk to me first if wedid not cover this in class)
+
+# get the stores ID, name, and URL for the stoes whos name start with a W, order by the store name
 def advanced1():
     with conn:
-        c.execute("""SELECT FirstName, LastName FROM Customer NATURAL JOIN CustomerPURCHASED NATURAL JOIN Product WHERE LastName LIKE 'D%' """)
+        c.execute("""SELECT StoreID, StoreName, URL FROM Store WHERE StoreName LIKE 'W%' ORDER BY StoreName""")
         return c.fetchall()
 
+# gets customers and their order count with more then 2 orders, sorted by most to fewest orders
 def advanced2():
     with conn:
-        c.execute("SELECT StoreName, ItemName FROM Product NATURAL JOIN StoreSELLS NATURAL JOIN STORE")
+        c.execute("""SELECT FirstName, LastName, Count(*) FROM Customer NATURAL JOIN CustomerPURCHASED NATURAL JOIN Product
+         GROUP BY CustomerID HAVING Count(*) > 2 ORDER BY Count(*) DESC""")
         return c.fetchall()
 
+# select all the First name, last name, and total spening amount for every cutomer who spent less then average
 def advanced3():
     with conn:
-        c.execute("SELECT StoreName, ItemName FROM Product NATURAL JOIN StoreSELLS NATURAL JOIN STORE")
+        c.execute("""SELECT FirstName, LastName, sum(Price) AS Total FROM Customer NATURAL JOIN CustomerPURCHASED NATURAL JOIN Product GROUP BY CustomerID
+        HAVING Total < avg((SELECT sum(Price) AS Cost FROM Customer NATURAL JOIN CustomerPURCHASED NATURAL JOIN Product GROUP BY CustomerID))""")
         return c.fetchall()
 
 def advanced4():
     with conn:
-        c.execute("SELECT StoreName, ItemName FROM Product NATURAL JOIN StoreSELLS NATURAL JOIN STORE")
+        c.execute("")
         return c.fetchall()
 
 def advanced5():
     with conn:
-        c.execute("SELECT StoreName, ItemName FROM Product NATURAL JOIN StoreSELLS NATURAL JOIN STORE")
+        c.execute("")
         return c.fetchall()
 
 def advanced6():
