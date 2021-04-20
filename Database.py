@@ -559,6 +559,12 @@ def get_all_cust():
     c.execute("SELECT * FROM Customer")
     return c.fetchall()
 
+def get_cust_id(FirstName, LastName, Street, Number, City, Zip, State):
+    c.execute("""SELECT CustomerID FROM Customer 
+    WHERE FirstName=:FirstName AND LastName=:LastName AND Street=:Street AND Number=:Number AND City=:City AND Zip=:Zip AND State=:State""",
+     {'FirstName': FirstName, 'LastName': LastName, 'Street': Street, 'Number': Number, 'City': City, 'Zip': Zip, 'State': State})
+    return c.fetchall()
+
 def edit_user(CustomerID, attribute, newVal):
     if attribute == "first name":
         with conn:
@@ -589,10 +595,10 @@ def edit_user(CustomerID, attribute, newVal):
             c.execute("UPDATE Customer SET State = :State WHERE CustomerID = :CustomerID",
              {'State': newVal, 'CustomerID': CustomerID})
 
-def remove_cust(FirstName, LastName):
+def remove_cust(id):
     with conn:
-        c.execute("DELETE from Customer WHERE FirstName = :FirstName AND LastName = :LastName",
-                  {'FirstName': FirstName, 'LastName': LastName})
+        c.execute("DELETE from Customer WHERE CustomerID = :CustomerID",
+                  {'CustomerID': id})
 
 ###########################################################################
 ######################## STORE METHODS ####################################
@@ -641,9 +647,13 @@ def edit_store(StoreID, attribute, newVal):
             c.execute("UPDATE Store SET State = :State WHERE StoreID = :StoreID",
              {'State': newVal, 'StoreID': StoreID})
 
-def remove_store(StoreName):
+def remove_store(id):
     with conn:
-        c.execute("DELETE from Store WHERE StoreName = :StoreName", {'StoreName': StoreName})
+        c.execute("DELETE from Store WHERE StoreID = :StoreID", {'StoreID': id})
+
+def remove_store_from_storeSELLS(id):
+    with conn:
+        c.execute("DELETE from StoreSELLS WHERE StoreID = :StoreID", {'StoreID': id})
 
 ###########################################################################
 ######################## PROUCT LIST METHODS ##############################
@@ -662,15 +672,27 @@ def get_all_list():
     c.execute("SELECT * FROM ProductList")
     return c.fetchall()
 
+def get_list_id(Title):
+    c.execute("SELECT ProductListID FROM ProductList WHERE Title=:Title", {'Title': Title})
+    return c.fetchall()
+
 def edit_product_list(id, attribute, newVal):
     if attribute == "title":
         with conn:
             c.execute("UPDATE ProductList SET Title = :Title WHERE ProductListID = :ProductListID",
              {'Title': newVal, 'ProductListID': id})
 
-def remove_product_list(Title):
+def remove_product_list(id):
     with conn:
-            c.execute("DELETE from ProductList WHERE Title = :Title", {'Title': Title})
+            c.execute("DELETE from ProductList WHERE ProductListID = :ProductListID", {'ProductListID': id})
+
+def remove_product_list_from_custHAS(id):
+    with conn:
+            c.execute("DELETE from CustomerHAS WHERE ProductListID = :ProductListID", {'ProductListID': id})
+
+def remove_product_list_from_prodListHAS(id):
+    with conn:
+            c.execute("DELETE from ProductListHAS WHERE ProductListID = :ProductListID", {'ProductListID': id})
 
 ###########################################################################
 ######################## PRODUCT METHODS ##################################
@@ -687,6 +709,10 @@ def get_all_product():
 
 def get_product_by_name(name):
     c.execute("SELECT * FROM Product WHERE ItemName=:ItemName", {'ItemName': name})
+    return c.fetchall()
+
+def get_product_id(sku, price, link, itemName):
+    c.execute("SELECT ProductID FROM Product WHERE SKU=:SKU AND Price=:Price AND Link=:Link AND ItemName=:ItemName", {'SKU': sku, 'Price': price, 'Link': link, 'ItemName': itemName})
     return c.fetchall()
 
 def edit_product(id, attribute, newVal):
@@ -707,11 +733,21 @@ def edit_product(id, attribute, newVal):
             c.execute("UPDATE Product SET ItemName = :ItemName WHERE ProductID = :ProductID",
              {'ItemName': newVal, 'ProductID': id})
 
-def remove_product(SKU):
+def remove_product(id):
     with conn:
-        c.execute("DELETE from Product WHERE SKU = :SKU", {'SKU': SKU})
+        c.execute("DELETE from Product WHERE ProductId = :ProductId", {'ProductId': id})
 
+def remove_prod_from_custPurch(id):
+    with conn:
+        c.execute("DELETE from CustomerPURCHASED WHERE ProductId = :ProductId", {'ProductId': id})
 
+def remove_product_from_list(id):
+    with conn:
+        c.execute("DELETE from ProductListHas WHERE ProductId = :ProductId", {'ProductId': id})
+    
+def remove_prod_from_storeSells(id):
+    with conn:
+        c.execute("DELETE from StoreSELLS WHERE ProductId = :ProductId", {'ProductId': id})
 ###########################################################################
 ######################## CustomerHAS methods ##############################
 ###########################################################################
@@ -730,6 +766,11 @@ def get_cust_list(custID):
     with conn:
         c.execute("SELECT Title FROM Customer NATURAL JOIN CustomerHAS NATURAL JOIN ProductList WHERE CustomerID = {}".format(custID))
         return c.fetchall()
+
+def remove_cust_from_custHas(id):
+    with conn:
+        c.execute("DELETE from CustomerHAS WHERE CustomerID = :CustomerID",
+                  {'CustomerID': id})
 ###########################################################################
 ######################## CustomerPURCHASED methods ##############################
 ###########################################################################
@@ -749,6 +790,10 @@ def get_cust_purch(custID):
         c.execute("SELECT ItemName, Date FROM Customer NATURAL JOIN CustomerPURCHASED NATURAL JOIN Product WHERE CustomerID = {}".format(custID))
         return c.fetchall()
 
+def remove_cust_from_custPurch(id):
+    with conn:
+        c.execute("DELETE from CustomerPURCHASED WHERE CustomerID = :CustomerID",
+                  {'CustomerID': id})
 ###########################################################################
 ######################## ProductListHAS methods ##############################
 ###########################################################################
@@ -768,6 +813,7 @@ def get_list_prods(custID):
         c.execute("SELECT ItemName FROM Customer NATURAL JOIN CustomerHAS NATURAL JOIN ProductList NATURAL JOIN ProductListHAS NATURAL JOIN Product WHERE CustomerID = {}".format(custID))
         return c.fetchall()
 
+
 ###########################################################################
 ######################## StoreSELLS methods ##############################
 ###########################################################################
@@ -784,34 +830,40 @@ def get_all_store_sells():
 
 def get_store_sells(storeID):
     with conn:
-        c.execute("SELECT ItemName FROM Product NATURAL JOIN StoreSELLS NATURAL JOIN STORE WHERE StoreID = {}".format(storeID))
+        c.execute("SELECT ItemName, Price FROM Product NATURAL JOIN StoreSELLS NATURAL JOIN STORE WHERE StoreID = {}".format(storeID))
         return c.fetchall()
 
 ###########################################################################
-######################## Advanced Quries ##############################
+######################## Advanced Queries ##############################
 ###########################################################################
-# Group 1: aggregate functions,LIKE,GROUP BY,ORDER BY,LIMIT– 
-# Group 2:HAVING,OFFSET, outer join, joining four or more tables– 
-# Group 3: subqueries,IN, set operators, any additional functionality outside of whatwas discussed in class will likely fall into this category (but please talk to me first if wedid not cover this in class)
 
 # get the stores ID, name, and URL for the stoes whos name start with a W, order by the store name
-def advanced1():
+def advanced1(x):
     with conn:
-        c.execute("""SELECT StoreID, StoreName, URL FROM Store WHERE StoreName LIKE 'W%' ORDER BY StoreName""")
+        c.execute("""
+        SELECT StoreID, StoreName, URL 
+        FROM Store 
+        WHERE StoreName LIKE '{}%' ORDER BY StoreName""".format(x))
         return c.fetchall()
 
-# gets customers and their order count with more then 2 orders, sorted by most to fewest orders
-def advanced2():
+# gets customers and their order count with more than 2 orders, sorted by most to fewest orders
+def advanced2(n):
     with conn:
-        c.execute("""SELECT FirstName, LastName, Count(*) FROM Customer NATURAL JOIN CustomerPURCHASED NATURAL JOIN Product
-         GROUP BY CustomerID HAVING Count(*) > 2 ORDER BY Count(*) DESC""")
+        c.execute("""
+        SELECT FirstName, LastName, Count(*)
+        FROM Customer NATURAL JOIN CustomerPURCHASED NATURAL JOIN Product
+        GROUP BY CustomerID 
+        HAVING Count(*) > {} ORDER BY Count(*) DESC""".format(n))
         return c.fetchall()
 
-# select all the First name, last name, and total spening amount for every cutomer who spent less then average
-def advanced3():
+# select all the First name, last name, and total spening amount for every cutomer from a given state who spent less then average from all states
+def advanced3(s):
     with conn:
-        c.execute("""SELECT FirstName, LastName, sum(Price) AS Total FROM Customer NATURAL JOIN CustomerPURCHASED NATURAL JOIN Product GROUP BY CustomerID
-        HAVING Total < avg((SELECT sum(Price) AS Cost FROM Customer NATURAL JOIN CustomerPURCHASED NATURAL JOIN Product GROUP BY CustomerID))""")
+        c.execute("""
+        SELECT FirstName, LastName, sum(Price) AS Total 
+        FROM Customer NATURAL JOIN CustomerPURCHASED NATURAL JOIN Product 
+        GROUP BY CustomerID
+        HAVING State = "{}" AND Total < avg((SELECT sum(Price) AS Cost FROM Customer NATURAL JOIN CustomerPURCHASED NATURAL JOIN Product GROUP BY CustomerID))""".format(s))
         return c.fetchall()
 
 def advanced4():
@@ -828,6 +880,7 @@ def advanced6():
     with conn:
         c.execute("SELECT StoreName, ItemName FROM Product NATURAL JOIN StoreSELLS NATURAL JOIN STORE")
         return c.fetchall()
+
 ###########################################################################
 ######################## USER INPUT #######################################
 ###########################################################################
@@ -864,7 +917,8 @@ def addSomthing():
         insert_product(prod) 
         enterRel = input("would you like to set the store that sells this product? (y, n) ")
         if(enterRel == 'y'):
-            prodID = input("Enter product ID ")
+            ID = get_product_id(SKU, Price, Link, ItemName)
+            prodID = ID[0][0]
             storeID = input("Enter store ID ")
             insert_storeSELLS(storeID, prodID)
         print(ItemName + " has been added")
@@ -873,13 +927,12 @@ def addSomthing():
         Title = input("Enter a title: ")
         list = Product_List(Title)
         insert_list(list)
-
         enterRel = input("would you like to associate a cutomer with this list? (y, n) ")
         if(enterRel == 'y'):
+            ID = get_list_id(Title)
+            listID = ID[0][0]
             custID = input("Enter customer ID ")
-            listID = input("Enter list ID ")
             insert_customerHAS(custID, listID)
-
         print(Title + " has been added")
 
     elif selection == "APL":
@@ -917,28 +970,36 @@ def removeSomthing():
     selection = input("Select what to remove: ").upper()
 
     if selection == "RU":
-        print("Enter first and last name of user to remove")
-        FirstName = input("Enter a first name: ")
-        LastName = input("Enter a last name: ")
-        remove_cust(FirstName, LastName)
-        print(FirstName + " " + LastName + " has been removed")
+        print("Enter id of user to remove")
+        id = input("Enter a id: ")
+        remove_cust(id)
+        remove_cust_from_custHas(id)
+        remove_cust_from_custPurch(id)
+        print(id + " has been removed")
 
     elif selection == "RP":
-        print("Enter SKU of item to remove")
-        SKU = input("Enter a SKU: ")
-        remove_product(SKU)
-        print(SKU + " has been removed")
+        print("Enter id of item to remove")
+        id = input("Enter a id: ")
+        remove_product(id)
+        remove_product_from_list(id)
+        remove_prod_from_custPurch(id)
+        remove_prod_from_storeSells(id)
+        print(id + " has been removed")
 
     elif selection == "RL":
-        print("Enter title of list to remove")
-        Title = input("Enter a title: ")
-        remove_product_list(Title)
-        print(Title + " has been removed")
+        print("Enter id of list to remove")
+        ID = input("Enter a id: ")
+        remove_product_list(ID)
+        remove_product_list_from_custHAS(ID)
+        remove_product_list_from_prodListHAS(ID)
+        print(ID + " has been removed")
+        
     elif selection == "RS":
-        print("Enter name of store to remove")
-        StoreName = input("Enter a name: ")
-        remove_store(StoreName)
-        print(StoreName + " has been removed")
+        print("Enter id of store to remove")
+        ID = input("Enter a id: ")
+        remove_store(ID)
+        remove_store_from_storeSELLS(ID)
+        print(ID + " has been removed")
 
 # called when the user want to edit data already in the database
 def editSomthing():
@@ -1053,9 +1114,9 @@ def viewStoredData():
 # called when the user wants to call complex queries
 
 def otherQueries():
-    print("(Q1) -- View customer's lists who have more then 3 items from Target\n")
-    print("(Q2) -- View customer's lists who have more then 3 items from Target\n")
-    print("(Q3) -- View customer's lists who have more then 3 items from Target\n")
+    print("(Q1) -- Get the store ID, name, and URL for the stoes whos name start with x, order by the store name\n")
+    print("(Q2) -- Get customers and their order count with more than n orders, sorted by most to fewest orders\n")
+    print("(Q3) -- Get every cutomer from a given state who spent less then average from all states\n")
     print("(Q4) -- View customer's lists who have more then 3 items from Target\n")
     print("(Q5) -- View customer's lists who have more then 3 items from Target\n")
     print("(Q6) -- View customer's lists who have more then 3 items from Target\n")
@@ -1063,11 +1124,14 @@ def otherQueries():
     selection = input("Select what to see: ").upper()
 
     if selection == 'Q1':
-        print(advanced1())
+        x = input("Enter x: ")
+        print(advanced1(x))
     elif selection == 'Q2':
-        print(advanced2())
+        n = input("Enter n: ")
+        print(advanced2(n))
     elif selection == 'Q3':
-        print(advanced3())
+        s = input("Enter s (TX): ")
+        print(advanced3(s))
     elif selection == 'Q4':
         print(advanced4())
     elif selection == 'Q5':
