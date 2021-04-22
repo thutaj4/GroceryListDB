@@ -78,8 +78,10 @@ def fill():
                       '4545', 'Houston', '65743', 'TX')
     cust_24 = Customer('Quincy', 'Fern', '1st street',
                       '5556', 'Houston', '65743', 'TX')
+    cust_25 = Customer('AJ', 'Thut', '10th street',
+                       '541', 'La Crosse', '65743', 'WI')
 
-    # insert_customer(cust_1)
+    insert_customer(cust_25)
     # insert_customer(cust_2)
     # insert_customer(cust_3)
     # insert_customer(cust_4)
@@ -906,8 +908,8 @@ def advanced5(x):
 def advanced6():
     with conn:
         c.execute("""
-        SELECT FirstName, LastName, CustomerID
-        FROM Customer LEFT JOIN CustomerPURCHASED JOIN Product
+        SELECT FirstName, LastName
+        FROM Customer LEFT JOIN CustomerPURCHASED
         ON Customer.CustomerID = CustomerPURCHASED.CustomerID 
         WHERE CustomerPURCHASED.ProductID = NULL
         """)
