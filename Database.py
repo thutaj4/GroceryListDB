@@ -866,19 +866,51 @@ def advanced3(s):
         HAVING State = "{}" AND Total < avg((SELECT sum(Price) AS Cost FROM Customer NATURAL JOIN CustomerPURCHASED NATURAL JOIN Product GROUP BY CustomerID))""".format(s))
         return c.fetchall()
 
-def advanced4():
+# if x is -1 find all store who sell more than the average number of products across all stores, otherwise
+# find all stores who sell more than the parameter amount
+def advanced4(x):
     with conn:
-        c.execute("")
+        if x == -1:
+            c.execute("""
+            SELECT NumProducts, StoreName, StoreID
+            FROM (SELECT count(*) AS NumProducts, StoreID, StoreName
+                    FROM Store NATURAL JOIN StoreSELLS NATURAL JOIN Product
+                    GROUP BY StoreID)
+            WHERE NumProducts > (SELECT avg(count) 
+                                FROM (SELECT count( * ) AS count
+                                        FROM Store NATURAL JOIN StoreSELLS NATURAL JOIN Product
+                                        GROUP BY StoreID
+                                        ORDER BY StoreID DESC)
+                                )
+            """)
+        else:
+            c.execute("""
+                        SELECT NumProducts, StoreName, StoreID
+                        FROM (SELECT count(*) AS NumProducts, StoreID, StoreName
+                                FROM Store NATURAL JOIN StoreSELLS NATURAL JOIN Product
+                                GROUP BY StoreID)
+                        WHERE NumProducts > {}
+                        GROUP BY StoreID
+                        """.format(x))
         return c.fetchall()
 
-def advanced5():
+#returns all customer's who's name starts with the parameter
+def advanced5(x):
     with conn:
-        c.execute("")
+        c.execute("""
+        SELECT CustomerID, FirstName, LastName
+        FROM Customer
+        WHERE FirstName Like '{}%'""".format(x))
         return c.fetchall()
 
 def advanced6():
     with conn:
-        c.execute("SELECT StoreName, ItemName FROM Product NATURAL JOIN StoreSELLS NATURAL JOIN STORE")
+        c.execute("""
+        SELECT FirstName, LastName, CustomerID
+        FROM Customer LEFT JOIN CustomerPURCHASED JOIN Product
+        ON Customer.CustomerID = CustomerPURCHASED.CustomerID 
+        WHERE CustomerPURCHASED.ProductID = NULL
+        """)
         return c.fetchall()
 
 ###########################################################################
@@ -1114,12 +1146,12 @@ def viewStoredData():
 # called when the user wants to call complex queries
 
 def otherQueries():
-    print("(Q1) -- Get the store ID, name, and URL for the stoes whos name start with x, order by the store name\n")
+    print("(Q1) -- Get the store ID, name, and URL for the stores who's name start with x, order by the store name\n")
     print("(Q2) -- Get customers and their order count with more than n orders, sorted by most to fewest orders\n")
-    print("(Q3) -- Get every cutomer from a given state who spent less then average from all states\n")
-    print("(Q4) -- View customer's lists who have more then 3 items from Target\n")
-    print("(Q5) -- View customer's lists who have more then 3 items from Target\n")
-    print("(Q6) -- View customer's lists who have more then 3 items from Target\n")
+    print("(Q3) -- Get every customer from a given state who spent less then average from all states\n")
+    print("(Q4) -- View all stores that sell more products then a specified amount or the average across all stores\n")
+    print("(Q5) -- View customer's who's names start with a specified letter\n")
+    print("(Q6) -- View customer's who haven't made a purchase\n")
 
     selection = input("Select what to see: ").upper()
 
@@ -1133,12 +1165,14 @@ def otherQueries():
         s = input("Enter s (TX): ")
         print(advanced3(s))
     elif selection == 'Q4':
-        print(advanced4())
+        x = input("Enter the number of products (-1 for average): ")
+        print(advanced4(x))
     elif selection == 'Q5':
-        print(advanced5())
+        x = input("Enter a letter: ")
+        print(advanced5(x))
     elif selection == 'Q6':
         print(advanced6())
-    else :
+    else:
         print("Not a valid selection")
 
 
