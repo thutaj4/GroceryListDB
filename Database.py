@@ -908,10 +908,11 @@ def advanced5(x):
 def advanced6():
     with conn:
         c.execute("""
-        SELECT FirstName, LastName
-        FROM Customer LEFT JOIN CustomerPURCHASED
-        ON Customer.CustomerID = CustomerPURCHASED.CustomerID 
-        WHERE CustomerPURCHASED.ProductID = NULL
+        SELECT FirstName, LastName, Customer.CustomerID, ItemName, Price, StoreName, Store.StoreID
+        FROM Customer JOIN CustomerPURCHASED JOIN Product JOIN StoreSELLS JOIN Store
+        ON Customer.CustomerID = CustomerPURCHASED.CustomerID AND CustomerPURCHASED.ProductID = Product.ProductID AND Product.ProductID = 
+        StoreSELLS.ProductID AND StoreSELLS.StoreID = Store.StoreID
+        ORDER BY Store.StoreID ASC, Customer.CustomerID ASC, Product.Price ASC
         """)
         return c.fetchall()
 
@@ -1153,7 +1154,7 @@ def otherQueries():
     print("(Q3) -- Get every customer from a given state who spent less then average from all states\n")
     print("(Q4) -- View all stores that sell more products then a specified amount or the average across all stores\n")
     print("(Q5) -- View customer's who's names start with a specified letter\n")
-    print("(Q6) -- View customer's who haven't made a purchase\n")
+    print("(Q6) -- View every customer's purchase from every store\n")
 
     selection = input("Select what to see: ").upper()
 
@@ -1173,7 +1174,8 @@ def otherQueries():
         x = input("Enter a letter: ")
         print(advanced5(x))
     elif selection == 'Q6':
-        print(advanced6())
+        for x in advanced6():
+            print(x)
     else:
         print("Not a valid selection")
 
