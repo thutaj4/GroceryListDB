@@ -848,7 +848,7 @@ def advanced1(x):
         WHERE StoreName LIKE '{}%' ORDER BY StoreName""".format(x))
         return c.fetchall()
 
-# gets customers and their order count with more than 2 orders, sorted by most to fewest orders
+# gets customers and their order count with more than n orders, sorted by most to fewest orders
 def advanced2(n):
     with conn:
         c.execute("""
@@ -858,7 +858,7 @@ def advanced2(n):
         HAVING Count(*) > {} ORDER BY Count(*) DESC""".format(n))
         return c.fetchall()
 
-# select all the First name, last name, and total spening amount for every cutomer from a given state who spent less then average from all states
+# select all the First name, last name, and total spening amount for every customer from a given state who spent less then average from all states
 def advanced3(s):
     with conn:
         c.execute("""
@@ -868,9 +868,29 @@ def advanced3(s):
         HAVING State = "{}" AND Total < avg((SELECT sum(Price) AS Cost FROM Customer NATURAL JOIN CustomerPURCHASED NATURAL JOIN Product GROUP BY CustomerID))""".format(s))
         return c.fetchall()
 
+#returns all customer's who's name starts with the parameter
+def advanced4(x):
+    with conn:
+        c.execute("""
+        SELECT CustomerID, FirstName, LastName
+        FROM Customer
+        WHERE FirstName Like '{}%'""".format(x))
+        return c.fetchall()
+
+def advanced5():
+    with conn:
+        c.execute("""
+        SELECT FirstName, LastName, Customer.CustomerID, ItemName, Price, StoreName, Store.StoreID
+        FROM Customer JOIN CustomerPURCHASED JOIN Product JOIN StoreSELLS JOIN Store
+        ON Customer.CustomerID = CustomerPURCHASED.CustomerID AND CustomerPURCHASED.ProductID = Product.ProductID AND Product.ProductID = 
+        StoreSELLS.ProductID AND StoreSELLS.StoreID = Store.StoreID
+        ORDER BY Store.StoreID ASC, Customer.CustomerID ASC, Product.Price ASC
+        """)
+        return c.fetchall()
+
 # if x is -1 find all store who sell more than the average number of products across all stores, otherwise
 # find all stores who sell more than the parameter amount
-def advanced4(x):
+def advanced6(x):
     with conn:
         if x == -1:
             c.execute("""
@@ -896,25 +916,6 @@ def advanced4(x):
                         """.format(x))
         return c.fetchall()
 
-#returns all customer's who's name starts with the parameter
-def advanced5(x):
-    with conn:
-        c.execute("""
-        SELECT CustomerID, FirstName, LastName
-        FROM Customer
-        WHERE FirstName Like '{}%'""".format(x))
-        return c.fetchall()
-
-def advanced6():
-    with conn:
-        c.execute("""
-        SELECT FirstName, LastName, Customer.CustomerID, ItemName, Price, StoreName, Store.StoreID
-        FROM Customer JOIN CustomerPURCHASED JOIN Product JOIN StoreSELLS JOIN Store
-        ON Customer.CustomerID = CustomerPURCHASED.CustomerID AND CustomerPURCHASED.ProductID = Product.ProductID AND Product.ProductID = 
-        StoreSELLS.ProductID AND StoreSELLS.StoreID = Store.StoreID
-        ORDER BY Store.StoreID ASC, Customer.CustomerID ASC, Product.Price ASC
-        """)
-        return c.fetchall()
 
 ###########################################################################
 ######################## USER INPUT #######################################
@@ -1152,9 +1153,9 @@ def otherQueries():
     print("(Q1) -- Get the store ID, name, and URL for the stores who's name start with x, order by the store name\n")
     print("(Q2) -- Get customers and their order count with more than n orders, sorted by most to fewest orders\n")
     print("(Q3) -- Get every customer from a given state who spent less then average from all states\n")
-    print("(Q4) -- View all stores that sell more products then a specified amount or the average across all stores\n")
-    print("(Q5) -- View customer's who's names start with a specified letter\n")
-    print("(Q6) -- View every customer's purchase from every store\n")
+    print("(Q4) -- View customers whose names start with a specified letter\n")
+    print("(Q5) -- View every customer’s purchase from every store\n")
+    print("(Q6) -- View all stores that sell more products than a specified number of products or more than the average across all stores\n")
 
     selection = input("Select what to see: ").upper()
 
@@ -1167,14 +1168,14 @@ def otherQueries():
     elif selection == 'Q3':
         s = input("Enter s (TX): ")
         print(advanced3(s))
-    elif selection == 'Q4':
+    elif selection == 'Q6':
         x = input("Enter the number of products (-1 for average): ")
+        print(advanced6(x))
+    elif selection == 'Q4':
+        x = input("Enter a letter: ")
         print(advanced4(x))
     elif selection == 'Q5':
-        x = input("Enter a letter: ")
-        print(advanced5(x))
-    elif selection == 'Q6':
-        for x in advanced6():
+        for x in advanced5():
             print(x)
     else:
         print("Not a valid selection")
