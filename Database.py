@@ -905,15 +905,17 @@ def advanced5(x):
         WHERE FirstName Like '{}%'""".format(x))
         return c.fetchall()
 
-def advanced6():
+def advanced6(price, numitems):
     with conn:
         c.execute("""
-        SELECT FirstName, LastName, Customer.CustomerID, ItemName, Price, StoreName, Store.StoreID
-        FROM Customer JOIN CustomerPURCHASED JOIN Product JOIN StoreSELLS JOIN Store
-        ON Customer.CustomerID = CustomerPURCHASED.CustomerID AND CustomerPURCHASED.ProductID = Product.ProductID AND Product.ProductID = 
-        StoreSELLS.ProductID AND StoreSELLS.StoreID = Store.StoreID
-        ORDER BY Store.StoreID ASC, Customer.CustomerID ASC, Product.Price ASC
-        """)
+            SELECT Store.StoreName, Store.StoreID, count(*) AS NumItems
+            FROM Store JOIN StoreSELLS JOIN Product
+            ON Store.StoreID = StoreSELLS.StoreID AND StoreSELLS.ProductID = Product.ProductID
+            WHERE Product.Price < {}
+            GROUP BY Store.StoreID
+            HAVING count(*) > {}
+            ORDER BY Store.StoreID ASC
+            """.format(price, numitems))
         return c.fetchall()
 
 ###########################################################################
@@ -1154,7 +1156,7 @@ def otherQueries():
     print("(Q3) -- Get every customer from a given state who spent less then average from all states\n")
     print("(Q4) -- View all stores that sell more products then a specified amount or the average across all stores\n")
     print("(Q5) -- View customer's who's names start with a specified letter\n")
-    print("(Q6) -- View every customer's purchase from every store\n")
+    print("(Q6) -- View stores that have a specified number of products under a specified price\n")
 
     selection = input("Select what to see: ").upper()
 
@@ -1174,7 +1176,9 @@ def otherQueries():
         x = input("Enter a letter: ")
         print(advanced5(x))
     elif selection == 'Q6':
-        for x in advanced6():
+        price = input("Enter price: ")
+        numItems = input("Enter number of items: ")
+        for x in advanced6(price, numItems):
             print(x)
     else:
         print("Not a valid selection")
