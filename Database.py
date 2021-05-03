@@ -914,7 +914,9 @@ def advanced6(price, numitems):
             WHERE Product.Price < {}
             GROUP BY Store.StoreID
             HAVING count(*) > {}
-            ORDER BY Store.StoreID ASC
+            ORDER BY count(*) ASC
+            LIMIT 5
+            OFFSET 2
         """.format(price, numitems))
         return c.fetchall()
 
@@ -1156,7 +1158,7 @@ def otherQueries():
     print("(Q3) -- Get every customer from a given state who spent less then average from all states\n")
     print("(Q4) -- View all stores that sell more products then a specified amount or the average across all stores\n")
     print("(Q5) -- View customer's who's names start with a specified letter\n")
-    print("(Q6) -- View stores that have a specified number of products under a specified price\n")
+    print("(Q6) -- View stores that have a specified number of products under a specified price, excluding worst two results\n")
 
     selection = input("Select what to see: ").upper()
 
