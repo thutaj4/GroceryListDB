@@ -908,14 +908,14 @@ def advanced5(x):
 def advanced6(price, numitems):
     with conn:
         c.execute("""
-            SELECT Store.StoreName, Store.StoreID, count(*) AS NumItems
+        SELECT Store.StoreName, Store.StoreID, count(*) AS NumItems
             FROM Store JOIN StoreSELLS JOIN Product
             ON Store.StoreID = StoreSELLS.StoreID AND StoreSELLS.ProductID = Product.ProductID
             WHERE Product.Price < {}
             GROUP BY Store.StoreID
             HAVING count(*) > {}
             ORDER BY Store.StoreID ASC
-            """.format(price, numitems))
+        """.format(price, numitems))
         return c.fetchall()
 
 ###########################################################################
@@ -1176,9 +1176,9 @@ def otherQueries():
         x = input("Enter a letter: ")
         print(advanced5(x))
     elif selection == 'Q6':
-        price = input("Enter price: ")
-        numItems = input("Enter number of items: ")
-        for x in advanced6(price, numItems):
+        x = input("Enter Price: ")
+        q = input("Enter quantity: ")
+        for x in advanced6(x, q):
             print(x)
     else:
         print("Not a valid selection")
